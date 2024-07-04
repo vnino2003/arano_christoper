@@ -36,40 +36,94 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 
 /**
 * ------------------------------------------------------
-*  Class Logger
+*  Class Config
 * ------------------------------------------------------
  */
-class Logger {
+class Config {
 
     /**
-     * log error etc
+     * Array of configurations
      *
-     * @param string $header
-     * @param string $message
-     * @param string $filename
-     * @param string $linenum
+     * @var array
+     */
+    private $config = [];
+
+
+    /**
+     * Get configuration value
+     *
+     * @param string $key
+     * @param string $source
      * @return void
      */
-    public function log($type = '', $header = '', $message = '', $filename = '', $linenum = '')
-    {
-        $logfile = config_item('log_dir').'log.txt';
-        if (! file_exists($logfile)) { 
-            mkdir(config_item('log_dir'), 0777, true);
-            $fh = fopen($logfile, 'w');
-            fclose($fh);
-        } 
-
-        $date = date("d/m/Y G:i:s");
-
-        if($type == 'debug' && (config_item('log_threshold') == 2 || config_item('log_threshold') == 3)) {
-            $err = "Date: ".$date."\n"."Debug Message: ".$header;
-            $err .= "\n------------------------------------------------------------------\n\n";
-            error_log($err, 3, $logfile);
-        } else if($type == 'error' && (config_item('log_threshold') == 1 || config_item('log_threshold') == 3)) {
-            $message = is_array($message)? implode("\n", $message): $message;
-            $err = "Date: ".$date."\n"."Exception Class: ".$header."\n"."Error Message: ".$message."\n"."Filename: ".$filename."\n"."Line Number: ".$linenum;
-            $err .= "\n------------------------------------------------------------------\n\n";
-            error_log($err, 3, $logfile);
-        }  
+    public function get($key, $source = 'config'){
+        return $this->_get($key, $source);
     }
- }
+
+    /**
+     * Set Configuration value
+     *
+     * @param string $key
+     * @param mixed $value
+     * @param string $source
+     * @return void
+     */
+    public function set($key, $value, $source){
+        $this->_set($key, $value, $source = 'config');
+    }
+
+    /**
+     * Get configuration value
+     *
+     * @param string $conf_key
+     * @param string $source
+     * @return void
+     */
+    private function _get($conf_key, $source)
+    {
+        static $config;
+
+        if (empty($this->config)) {
+
+            $config_file = APP_DIR . 'config/' . $source . '.php';       
+
+            if (!file_exists($config_file)) {
+                throw new Exception("Configuration file " . $source . " doesn't exist");
+            }
+
+            require $config_file;           
+            
+            $this->config = $config;
+
+            if ( isset($config) OR is_array($config) )
+			{
+				foreach( $config as $key => $val )
+				{
+					$config[$key] = $val;
+				}
+				return $config[$conf_key];
+			}   
+        }
+
+        return $this->config[$conf_key];
+    }
+
+    /**
+     * Set default or new config value
+     *
+     * @param string $key
+     * @param string $value
+     * @param string $source
+     * @return void
+     */
+    private function _set($conf_key, $value, $source)
+    {
+        if (empty($this->config)) {
+            $this->_get($conf_key, $source);
+        }
+
+        if($conf_key && $source){
+            $this->config[$conf_key] = $value;
+        }
+    }
+}
