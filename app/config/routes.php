@@ -43,17 +43,8 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 |
 */
 
-$router->get('/', 'Welcome::index');
-
-//User
-$router->get('/register', 'userController::registerForm');
-$router->post('/create-user', 'userController::createUser');
-
-
-
-//admin
-$router->get('/admin', 'userController::read');
-$router->post('/admin-edit/{id}', 'userController::updateUser');
-$router->post('/admin-delete/{id}', 'userController::deleteUser');
-
-
+// Routes
+$router->get('/', 'crud_Controller::read');          // list + form view
+$router->post('/create-user', 'crud_Controller::createUser'); // register student
+$router->post('/update-user/{id}', 'crud_Controller::updateUser'); // update student
+$router->post('/delete-user/{id}', 'crud_Controller::deleteUser'); // delete student
