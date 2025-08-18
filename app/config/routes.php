@@ -44,3 +44,16 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 */
 
 $router->get('/', 'Welcome::index');
+
+//User
+$router->get('/register', 'userController::registerForm');
+$router->post('/create-user', 'userController::createUser');
+
+
+
+//admin
+$router->get('/admin', 'userController::read');
+$router->post('/admin-edit/{id}', 'userController::updateUser');
+$router->post('/admin-delete/{id}', 'userController::deleteUser');
+
+
