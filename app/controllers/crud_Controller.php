@@ -17,7 +17,7 @@ class crud_Controller extends Controller {
     }
 
     public function read(){
-         $data['getAll'] = $this->crud_Model->getAll();
+         $data['getAll'] = $this->crud_Model->all();
         $this->call->view('index', $data);
     }
 
@@ -25,32 +25,31 @@ class crud_Controller extends Controller {
   public function createUser()
     {
         $this->form_validation
-            ->name('student_id')
+            ->name('product_name')
                 ->required()
                 ->max_length(50)
-            ->name('first_name')
+            ->name('quantity')
                 ->required()
                 ->max_length(200)
-            ->name('last_name')
+            ->name('Price')
                 ->required()
-                ->max_length(200)
-            ->name('course')
-                ->required()
-                ->max_length(100);
+                ->max_length(200);
+           
 
         if ($this->form_validation->run() == FALSE) {
             $errors = $this->form_validation->get_errors();
             setErrors($errors);
             redirect('/');
         } else {
-            $this->crud_Model->createUser([
-                'student_id' => $_POST['student_id'],
-                'first_name' => $_POST['first_name'],
-                'last_name'  => $_POST['last_name'],
-                'course'     => $_POST['course']
+            $this->crud_Model->insert([
+                'product_name' => $_POST['product_name'],
+                'quantity' => $_POST['quantity'],
+                'Price'  => $_POST['Price'],
+                'created_at' => date('y-m-d H:i:s'),
+                'updated_at' => date('y-m-d H:i:s')
             ]);
 
-            setMessage('success', 'Student registered successfully!');
+            setMessage('success', 'Product registered successfully!');
             redirect('/');
         }
     }
@@ -58,20 +57,19 @@ class crud_Controller extends Controller {
 
 
      public function updateUser($id){
-        $this->crud_Model->updateUser($id, [
-            'student_id' => $_POST['student_id'], // allow updating student_id too
-            'first_name' => $_POST['first_name'],
-            'last_name'  => $_POST['last_name'],
-            'course'     => $_POST['course'],
+        $this->crud_Model->update($id, [
+            'product_name' => $_POST['product_name'],
+             'quantity' => $_POST['quantity'],
+            'Price'  => $_POST['Price'],
         ]);
-        setMessage('success', 'Student updated successfully!');
+        setMessage('success', 'Product updated successfully!');
         redirect('/');
     }
 
 
      public function deleteUser($id){
-        $this->crud_Model->deleteUser($id);
-        setMessage('danger', 'Student deleted successfully!');
+        $this->crud_Model->delete($id);
+        setMessage('danger', 'Product deleted successfully!');
         redirect('/');
     }
 }
